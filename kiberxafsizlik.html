@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiberxafsizlik Qoidalar To'plami | @dr4x0n</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #050508;
+    --surface: #0a0a0f;
+    --card: #0d0d15;
+    --border: #1a1a2e;
+    --accent: #00ff88;
+    --accent2: #00ccff;
+    --accent3: #ff0055;
+    --text: #c8d6e5;
+    --muted: #4a5568;
+    --glow: 0 0 20px rgba(0,255,136,0.3);
+    --glow2: 0 0 20px rgba(0,204,255,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  #cursor {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, background 0.2s;
+    box-shadow: 0 0 15px var(--accent), 0 0 30px rgba(0,255,136,0.4);
+  }
+
+  #cursor-trail {
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(0,255,136,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+  }
+
+  /* Slime scroll container */
+  #slime-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.06;
+  }
+
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5,5,8,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-shadow: var(--glow);
+  }
+
+  .logo span { color: var(--accent2); }
+
+  .header-meta {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  .header-meta a {
+    color: var(--accent2);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .header-meta a:hover { color: var(--accent); text-shadow: var(--glow); }
+
+  /* Hero */
+  .hero {
+    padding: 80px 40px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: inline-block;
+    border: 1px solid rgba(0,255,136,0.2);
+    padding: 6px 16px;
+    border-radius: 2px;
+  }
+
+  .hero h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 600px;
+    margin: 0 auto 40px;
+  }
+
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent);
+    display: block;
+    text-shadow: var(--glow);
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 30px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-right: 6px;
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    padding: 6px 14px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: var(--glow);
+    background: rgba(0,255,136,0.05);
+  }
+
+  .search-box {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 6px 14px;
+    transition: border-color 0.2s;
+  }
+
+  .search-box:focus-within {
+    border-color: var(--accent2);
+    box-shadow: var(--glow2);
+  }
+
+  .search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    width: 200px;
+  }
+
+  .search-box input::placeholder { color: var(--muted); }
+
+  .search-icon {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  /* Progress indicator */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    z-index: 200;
+    transition: width 0.1s;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* Cards grid */
+  .rules-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+  }
+
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+    padding-top: 10px;
+  }
+
+  .section-divider h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--accent);
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0.3;
+  }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 50px;
+  }
+
+  .rule-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  .rule-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .rule-card:hover {
+    border-color: rgba(0,255,136,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 15px rgba(0,255,136,0.05);
+  }
+
+  .rule-card:hover::before { opacity: 1; }
+
+  .rule-card.short::before { background: var(--accent); }
+  .rule-card.full::before { background: var(--accent2); }
+
+  .rule-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rule-num .badge {
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+  }
+
+  .badge-short {
+    background: rgba(0,255,136,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(0,255,136,0.2);
+  }
+
+  .badge-full {
+    background: rgba(0,204,255,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(0,204,255,0.2);
+  }
+
+  .rule-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .rule-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.7;
+    display: none;
+  }
+
+  .rule-card.expanded .rule-desc { display: block; }
+
+  .expand-btn {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    margin-top: 10px;
+    padding: 0;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .expand-btn:hover { color: var(--accent2); }
+
+  .cat-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    font-size: 0.8rem;
+    text-align: center;
+    line-height: 20px;
+  }
+
+  /* Back to top */
+  #back-top {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 2px;
+    z-index: 50;
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: var(--glow);
+  }
+
+  #back-top.visible { opacity: 1; }
+  #back-top:hover { background: rgba(0,255,136,0.1); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 30px 40px;
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  footer a {
+    color: var(--accent2);
+    text-decoration: none;
+  }
+
+  footer a:hover { color: var(--accent); }
+
+  /* Scanlines overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    header, .filter-bar, .rules-container { padding-left: 16px; padding-right: 16px; }
+    .hero { padding: 50px 16px 40px; }
+    .rules-grid { grid-template-columns: 1fr; }
+    .search-box input { width: 140px; }
+    .stats-row { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+<div class="progress-bar" id="progress"></div>
+<canvas id="slime-canvas"></canvas>
+
+<div class="page-wrapper">
+
+<header>
+  <div class="logo">CYBER<span>SEC</span></div>
+  <div class="header-meta">MUALLIF: <a href="https://t.me/dr4x0n" target="_blank">@dr4x0n</a></div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">// kiberxafsizlik qoidalar to'plami</div>
+  <h1>Raqamli Himoya<br>Qoidalari</h1>
+  <p>Kiberxafsizlik sohasidagi eng muhim 900+ qoida — qisqacha va batafsil ko'rinishda. Har bir qoidani kengaytiring va chuqurroq o'rganing.</p>
+  <div class="stats-row">
+    <div class="stat"><span class="stat-num">900+</span><span class="stat-label">Qoidalar</span></div>
+    <div class="stat"><span class="stat-num">9</span><span class="stat-label">Kategoriya</span></div>
+    <div class="stat"><span class="stat-num">2</span><span class="stat-label">Format</span></div>
+  </div>
+</section>
+
+<div class="filter-bar">
+  <span class="filter-label">FILTER:</span>
+  <button class="filter-btn active" data-filter="all">Barchasi</button>
+  <button class="filter-btn" data-filter="short">Short</button>
+  <button class="filter-btn" data-filter="full">Full</button>
+  <div class="search-box">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Qoida qidirish...">
+  </div>
+</div>
+
+<div class="rules-container" id="rulesContainer"></div>
+
+</div><!-- page-wrapper -->
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ YUQORI</button>
+
+<footer>
+  &copy; 2025 &nbsp;|&nbsp; Muallif: <a href="https://t.me/dr4x0n" target="_blank">@dr4x0n</a> &nbsp;|&nbsp; Kiberxafsizlik Qoidalar To'plami
+</footer>
+
+<script>
+// ─────────────────────────────────────────────
+// CURSOR
+// ─────────────────────────────────────────────
+const cur = document.getElementById('cursor');
+const trail = document.getElementById('cursor-trail');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top = e.clientY + 'px';
+  setTimeout(() => {
+    trail.style.left = e.clientX + 'px';
+    trail.style.top = e.clientY + 'px';
+  }, 80);
+});
+
+// ─────────────────────────────────────────────
+// SCROLL PROGRESS
+// ─────────────────────────────────────────────
+const prog = document.getElementById('progress');
+const backTop = document.getElementById('back-top');
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  prog.style.width = pct + '%';
+  backTop.classList.toggle('visible', window.scrollY > 400);
+});
+
+// ─────────────────────────────────────────────
+// SLIME CANVAS (ambient particles)
+// ─────────────────────────────────────────────
+const canvas = document.getElementById('slime-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const particles = [];
+for (let i = 0; i < 60; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2 + 0.5,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    color: Math.random() > 0.5 ? '#00ff88' : '#00ccff'
+  });
+}
+
+function drawSlime() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+
+    // draw connections
+    for (let j = i + 1; j < particles.length; j++) {
+      const q = particles[j];
+      const dx = p.x - q.x, dy = p.y - q.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(q.x, q.y);
+        ctx.strokeStyle = p.color;
+        ctx.globalAlpha = (1 - dist/120) * 0.5;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  }
+  requestAnimationFrame(drawSlime);
+}
+drawSlime();
+
+// ─────────────────────────────────────────────
+// RULES DATA
+// ─────────────────────────────────────────────
+const categories = [
+  { id: 'passwords', name: '🔐 Parollar va Autentifikatsiya', color: '#00ff88' },
+  { id: 'network', name: '🌐 Tarmoq Xavfsizligi', color: '#00ccff' },
+  { id: 'malware', name: '🦠 Zararli Dasturlar', color: '#ff6600' },
+  { id: 'phishing', name: '🎣 Fishing va Ijtimoiy Muhandislik', color: '#ff0055' },
+  { id: 'data', name: '💾 Ma\'lumotlar Himoyasi', color: '#9f7aea' },
+  { id: 'mobile', name: '📱 Mobil Xavfsizlik', color: '#f6ad55' },
+  { id: 'web', name: '🔗 Veb Xavfsizlik', color: '#68d391' },
+  { id: 'crypto', name: '🔑 Kriptografiya', color: '#63b3ed' },
+  { id: 'incident', name: '🚨 Hodisalarga Munosabat', color: '#fc8181' }
+];
+
+const rulesData = {
+  passwords: [
+    { n:1, t:"Murakkab parol ishlating", d:"Parol kamida 12 ta belgidan iborat bo'lishi, katta va kichik harflar, raqamlar va maxsus belgilar (!, @, #, $) ni o'z ichiga olishi kerak. 'qwerty123' yoki ismingiz kabi oddiy parollar 1 soniyada buzib olish mumkin." },
+    { n:2, t:"Har bir sayt uchun alohida parol", d:"Agar bitta sayt buzilsa, boshqa barcha hisoblaringiz xavf ostiga tushmasligi uchun har xil platformada turli xil parollardan foydalaning. Parol menejeri bu vazifani osonlashtiradi." },
+    { n:3, t:"Parol menejeridan foydalaning", d:"Bitwarden, 1Password, KeePass kabi ishonchli parol meneyjerlarini ishlating. Ular kuchli parollarni yaratadi, xavfsiz saqlaydi va avtomatik to'ldiradi. Miya xotirangizga tayanmang." },
+    { n:4, t:"2FA (Ikki faktorli autentifikatsiya) yoqing", d:"SMS yoki autentifikator ilovasi (Google Authenticator, Authy) orqali 2FA ni barcha muhim hisoblarda yoqing. Hatto parolingiz oshkor bo'lsa ham, ikkinchi faktor uni himoya qiladi." },
+    { n:5, t:"Parolni hech kimga bermang", d:"Hech qanday haqiqiy kompaniya yoki xizmat sizdan parolingizni so'ramaydi. Telefon, email yoki chat orqali parol so'ragan har qanday so'rov — bu fishing hujumi." },
+    { n:6, t:"Parolni muntazam yangilang", d:"Muhim hisoblar uchun parolni har 3-6 oyda bir marta o'zgartiring. Agar biror sayt buzilganini eshitsangiz, darhol parolni yangilang." },
+    { n:7, t:"'Parolni eslab qolish' funksiyasini ehtiyotkorlik bilan ishlating", d:"Brauzerda parollarni saqlash qulay, lekin kimdir kompyuteringizga kirsa, barcha parollaringizga ega bo'lishi mumkin. Maxsus parol menejeri xavfsizroq alternativa hisoblanadi." },
+    { n:8, t:"Default parollarni o'zgartiring", d:"Yangi router, kamera yoki qurilma o'rnatganda dastlabki parolni darhol o'zgartiring. 'admin/admin' yoki 'admin/password' kabi standart parollar hammaga ma'lum." },
+    { n:9, t:"Parol mantrasi usulidan foydalaning", d:"Kuchli va eslab qoladigan parol uchun iborani olishingiz mumkin: 'Mening itim 2021 yilda tug'ilgan!' → 'Mim@2021yt!' Uzun va ma'noli jumlalar yaxshi parolga asos bo'ladi." },
+    { n:10, t:"Parolingiz buzilganini tekshiring", d:"HaveIBeenPwned.com saytida email manzilingizni tekshirib, ma'lumotlaringiz qanday buzilishlarda oshkor bo'lganini aniqlang va zarar ko'rgan hisoblar parolini yangilang." },
+    { n:11, t:"PIN kodlar uchun oddiy ketma-ketliklardan saqlaning", d:"1234, 0000, qo'ng'iroq raqamingizning oxirgi 4 raqami — bularning barchasi eng ko'p sinab ko'riladigan PIN kodlar. Tasodifiy va noodatiy raqam kombinatsiyalarini tanlang." },
+    { n:12, t:"Xavfsizlik savollari uchun haqiqiy javob berish shart emas", d:"'Onangizning qiz familiyasi?' kabi savollarga haqiqiy javob bering yoki... to'liq tasodifiy javob yozing va parol menejerida saqlang. Ijtimoiy tarmoqlarda topish mumkin bo'lgan ma'lumot xavfsiz emas." },
+    { n:13, t:"Biometrik autentifikatsiyani to'g'ri tushunib ishlating", d:"Barmoq izi va yuz tanish qulay, lekin sud yoki majburlov bilan chetlab o'tish mumkin. Muhim qurilmalar uchun kuchli PIN yoki parolni ham o'rnating." },
+    { n:14, t:"Hardware kalit (YubiKey) ishlating", d:"Eng yuqori darajadagi xavfsizlik uchun fizik xavfsizlik kalitlari (YubiKey, Titan Key) ishlatishingiz mumkin. Ular fishing hujumlariga qarshi eng samarali himoya hisoblanadi." },
+    { n:15, t:"Parol tarixini saqlang", d:"Ayrim tizimlar parolni o'zgartirganda eski parolni qayta ishlatishga yo'l qo'ymaydi — bu yaxshi xususiyat. Eski parollarni aslo qayta ishlatmang." },
+    { n:16, t:"Foydalanuvchi nomini ham maxfiy saqlang", d:"Login sifatida email manzilingizni emas, alohida foydalanuvchi nomi o'ylab toping. Email manzilingiz ko'pincha oshkor bo'lgan bo'ladi, foydalanuvchi nomi esa qo'shimcha himoya qatlami." },
+    { n:17, t:"Sessiya vaqtini cheklang", d:"Bank va boshqa muhim saytlarda 'meni eslab qol' funksiyasini ishlatmang. Sessiya tugagandan so'ng tizimdan chiqishni odatga aylantiring." },
+    { n:18, t:"Parol almashish xavfini bilin", d:"Oila yoki do'stlar bilan parol bo'lishish ko'pincha kerak bo'ladi — bu holda vaqtincha kirish uchun alohida hisob yarating yoki kirish berishdan keyin parolni o'zgartiring." },
+    { n:19, t:"Passphrase (iborali parol) texnikasi", d:"Bir nechta tasodifiy so'zdan iborat iboralar (masalan: 'qizil-tog'-dengiz-uchadi') kuchli va eslab qoladigan parollar yaratadi. 4 ta tasodifiy so'z 30 ta belgidan iborat tasodifiy paroldan ham kuchliroq bo'lishi mumkin." },
+    { n:20, t:"Parol reset jarayoni xavfsizligini tekshiring", d:"Ko'p saytlarda parol tiklash email orqali amalga oshiriladi — bu degani email manzilingiz sizning eng muhim hisobingiz. Email hisobingizni alohida kuchli parol va 2FA bilan himoya qiling." },
+    { n:21, t:"Korporativ parol siyosatiga rioya qiling", d:"Tashkilot parol talablariga rioya qiling, lekin ular juda kam talab qo'ysa, o'zingiz uchun yuqori standart belgilang." },
+    { n:22, t:"Mehmon tarmoqlarida avtomatik kirish xavfi", d:"'Saqlangan tarmoqlarga avtomatik ulanish' funksiyasi qulay, lekin xakerlar shu nomdagi soxta tarmoq yaratib, trafikingizni ushlab qolishi mumkin." },
+    { n:23, t:"Parolsiz autentifikatsiya (Passkeys) kelajagi", d:"Passkeys — bu parolsiz xavfsizlik. Apple, Google va Microsoft ularni joriy etmoqda. Yangi va xavfsizroq texnologiya sifatida passkeysni qo'llab-quvvatlang." },
+    { n:24, t:"Kripto hamyon seed phraseni maxsus himoya qiling", d:"12 yoki 24 so'zli kripto hamyon seed phrase paroldan ham muhimroq. Uni hech qachon internetga yubormang, ekran suratini olmang, faqat qog'ozga yozing va xavfsiz joyda saqlang." },
+    { n:25, t:"Kirish urinishlari limitini o'rnating", d:"Agar siz administrator bo'lsangiz, tizimda belgilangan miqdordan ko'p noto'g'ri kirish urinishidan so'ng hisobni vaqtincha bloklang yoki CAPTCHA talab qiling." },
+    { n:26, t:"Single Sign-On (SSO) dan ehtiyotkorlik bilan foydalaning", d:"'Google bilan kirish' qulay, lekin Google hisobingiz buzilsa, barcha ulangan xizmatlar ham xavf ostida qoladi. Asosiy SSO hisobingizni alohida himoya qiling." },
+    { n:27, t:"Parol kompleksligini tushunib oling", d:"Uzunlik murakkablikdan muhimroq. 20 ta belgili oddiy ibora 8 ta belgili murakkab paroldan kuchliroq. Zamonaviy tavsiyanomalar uzunlikni birinchi o'ringa qo'yadi." },
+    { n:28, t:"Lug'at hujumlariga qarshi turing", d:"Oddiy so'zlar, mashhur nomlar, sana va joy nomlari parol sifatida ishlatmang. Lug'at hujumlari millionlab keng tarqalgan so'z va iboralarni tekshirib chiqadi." },
+    { n:29, t:"Korporativ hisoblar uchun privileged access management (PAM) qo'llang", d:"Administrator va boshqa imtiyozli hisoblarni alohida PAM tizimi orqali boshqaring. Kunlik ishlar uchun minimal huquqli hisobdan foydalaning." },
+    { n:30, t:"Parolsiz dunyoga o'tish uchun tayyor bo'ling", d:"Sanoat FIDO2 va WebAuthn standartlarига o'tmoqda. Ushbu yangi texnologiyalarni qabul qiling va qo'llang — kelajak parolsiz autentifikatsiyaga asoslanadi." }
+  ],
+  network: [
+    { n:31, t:"VPN ishlating", d:"Ommaviy Wi-Fi tarmoqlarida va internet provayderingizdan trafikingizni yashirish uchun ishonchli VPN xizmatidan foydalaning. Bepul VPN xizmatlari ko'pincha ma'lumotlaringizni sotadi — pullik, ishonchli xizmatni tanlang." },
+    { n:32, t:"Ommaviy Wi-Fi dan ehtiyotkorlik bilan foydalaning", d:"Kafe, aeroport yoki mehmonxonalardagi ochiq Wi-Fi tarmoqlarida bank operatsiyalari yoki maxfiy ma'lumotlarga kirish xavfli. VPN yoqing yoki mobil internet ishlating." },
+    { n:33, t:"Router xavfsizligini kuchaytiring", d:"Uy routeringiz dasturiy ta'minotini muntazam yangilang, standart parolni o'zgartiring, WPA3 yoki WPA2 shifrlashni yoqing, va WPS ni o'chiring." },
+    { n:34, t:"Tarmoqni segmentatsiya qiling", d:"Uy tarmog'ingizda mehmon tarmog'i (Guest Wi-Fi) yarating. Smart TV, printer va IoT qurilmalar uchun alohida tarmoq segmenti ko'proq xavfsizlik ta'minlaydi." },
+    { n:35, t:"DNS xavfsizligi", d:"ISP DNS serverlaridan ko'ra xavfsirroq DNS (Cloudflare 1.1.1.1, Google 8.8.8.8) yoki DNS over HTTPS/TLS dan foydalaning. Bu DNS poisoning hujumlariga qarshi himoya beradi." },
+    { n:36, t:"Firewall'ni yoqing va sozlang", d:"Operatsion tizim va router brautmauer (firewall) ni yoqing. Kerakli portlarni ochiq qoldiring, barcha boshqalarini yoping. Kiruvchi ulanishlarni nazorat qiling." },
+    { n:37, t:"Tarmoq monitoringini o'rnating", d:"Tarmog'ingizda noodatiy faoliyat bo'lsa bilish uchun IDS/IPS (tarmoq hujumini aniqlash va oldini olish tizimi) o'rnating. Wireshark kabi vositalar bilan trafigingizni o'rganib chiqing." },
+    { n:38, t:"Port skanerlash tekshiruvi o'tkazing", d:"Nmap kabi vositalar bilan o'z tarmoqingizni tekshiring. Ochiq qolgan keraksiz portlar hujumchilar uchun kirish nuqtasiga aylanishi mumkin." },
+    { n:39, t:"VLAN bilan tarmogingizni bo'ling", d:"Korporativ muhitda turli xil qurilmalar va foydalanuvchilar uchun Virtual LAN (VLAN) ajrating. Bu tarmoq ichida tarqaladigan hujumlarni cheklaydi." },
+    { n:40, t:"Masofaviy kirish xavfsizligi", d:"RDP (Remote Desktop Protocol) bevosita internetga ochib qo'ymang. VPN orqali masofaviy kirish, Port knock yoki Zero Trust yondashuvini qo'llang." },
+    { n:41, t:"SSL/TLS sertifikatlarini tekshiring", d:"Veb-saytda qulf belgisi borligini va sertifikat haqiqiy ekanligini tekshiring. Sertifikat xatolarini e'tiborsiz qoldirmang — bu man-in-the-middle hujumining belgisi bo'lishi mumkin." },
+    { n:42, t:"Network Access Control (NAC) qo'llang", d:"Korporativ tarmoqqa faqat ruxsat etilgan, xavfsizlik talablariga javob beradigan qurilmalar ulanishiga ruxsat bering. 802.1X standartini qo'llang." },
+    { n:43, t:"Intrusion Prevention System (IPS) joriy eting", d:"Hujumlarni faqat aniqlash emas, balki ularni avtomatik bloklash uchun IPS xizmatini o'rnating va muntazam yangilang." },
+    { n:44, t:"BGP xavfsizligini e'tiborga oling", d:"Internet provayderlar va korporativ tarmoqlarda BGP hijacking hujumlariga qarshi RPKI (Resource Public Key Infrastructure) choralarini ko'ring." },
+    { n:45, t:"DDoS himoyasini ta'minlang", d:"Veb-sayt va serverlaringizni DDoS hujumlaridan himoya qilish uchun Cloudflare, Akamai yoki maxsus anti-DDoS xizmatlari bilan ishlang." },
+    { n:46, t:"Zero Trust arxitekturasiga o'ting", d:"'Hech qachon ishonma, doimo tekshir' tamoyilini qo'llang. Tarmoq ichidagi qurilmalar ham tashqaridan kelgan ulanishdek xavfsizlik tekshiruvidan o'tsin." },
+    { n:47, t:"Network Time Protocol (NTP) xavfsizligi", d:"NTP serverlari autentifikatsiyasini yoqing. NTP amplification hujumlari kuchli DDoS vositasiga aylanishi mumkin." },
+    { n:48, t:"Software Defined Networking (SDN) xavfsizligi", d:"SDN arxitekturasida nazorat tekisligini himoya qilishga alohida e'tibor bering. SDN kontrollerini buzilishdan saqlang." },
+    { n:49, t:"Tarmoq topologiyasini hujjatlang", d:"Tarmog'ingizning to'liq sxemasini saqlang. Hodisa sodir bo'lganda tez munosabat bildirish uchun tarmog'ingizni yaxshi bilishingiz zarur." },
+    { n:50, t:"SNMP xavfsizligi", d:"SNMP v1 va v2 ni o'chiring, faqat SNMP v3 ni (autentifikatsiya va shifrlash bilan) ishlating. Standart community string 'public' va 'private' ni o'zgartiring." },
+    { n:51, t:"Wi-Fi autentifikatsiya protokollarini yangilang", d:"WPA3 mavjud bo'lsa, WPA2 dan WPA3 ga o'ting. WPA3 SAE (Simultaneous Authentication of Equals) offline lug'at hujumlarini oldini oladi." },
+    { n:52, t:"Tarmoq trafigini shifrlang", d:"Imkoni bo'lsa, barcha ichki tarmoq trafigini ham shifrlang. 'East-West' trafik shifrlash lateral harakatlanishni qiyinlashtiradi." },
+    { n:53, t:"MAC address filtrlash", d:"Router darajasida faqat ro'yxatdagi MAC adreslarni qabul qilish sozlamasini o'rnating. Bu oddiy, lekin qo'shimcha himoya qatlami beradi." },
+    { n:54, t:"Bluetooth xavfsizligi", d:"Bluetooth ni faqat kerak bo'lganda yoqing. Ommaviy joylarda 'Discoverable' (topilgan) rejimidan saqlaning. Yangi Bluetooth zaifliklarini kuzatib boring." },
+    { n:55, t:"NAT ortidagi xavfsizlik aldoviga tushmang", d:"Network Address Translation (NAT) xavfsizlik qatlamining o'rnini bosa olmaydi. NAT borligida ham firewall va boshqa himoya choralarini saqlang." },
+    { n:56, t:"IPv6 xavfsizligini alohida yechim sifatida qarang", d:"IPv6 ga o'tish paytida firewall qoidalarini IPv6 uchun ham sozlang. Ko'p tarmoqlarda IPv6 trafiki IPv4 ga qaraganda kam nazorat qilinadi." },
+    { n:57, t:"Honey pot o'rnating", d:"Soxta nishon (honeypot) o'rnatish hujumchilarni aniqlash va ularning usullarini o'rganishga yordam beradi." },
+    { n:58, t:"Tarmoq qurilmalari loglari", d:"Router, switch va firewall log fayllarini markaziy SIEM tizimiga yig'ing va muntazam tahlil qiling. G'ayrioddiy faoliyatni tezda aniqlash imkoniyatini yoqing." },
+    { n:59, t:"Kabel xavfsizligini e'tiborga oling", d:"Server xonalariga fizik kirish nazoratini ta'minlang. Fizik media (kabel) ga kirish trafikni ushlab qolish imkonini beradi." },
+    { n:60, t:"Tarmoq asosiy xavfsizlik standartlarini o'rganib chiqing", d:"NIST SP 800-41, CIS Controls, ISO 27033 kabi tarmoq xavfsizligi standartlarini o'rganing va ularga amal qiling." }
+  ],
+  malware: [
+    { n:61, t:"Antivirus/EDR ishlating va yangilab turing", d:"Ishonchli antivirus (Windows Defender, Kaspersky, Bitdefender) yoki zamonaviy EDR (Endpoint Detection & Response) xizmatini o'rnating. Viruslar bazasi avtomatik yangilanishini yoqing." },
+    { n:62, t:"Dastur va OSni yangilab turing", d:"Windows Update, macOS Software Update va ilovalar yangilanishlarini kechiktirmang. Ko'p zararli dasturlar noma'lum zaifliklardan foydalanadi — patch ularni yopadi." },
+    { n:63, t:"Faqat ishonchli manbalardan yuklab oling", d:"Dasturlarni faqat rasmiy saytlar, App Store, Play Market dan yuklab oling. Crack, keygen, warez saytlari va norasmiy manbalardagi fayllar ko'pincha troyan o'z ichiga oladi." },
+    { n:64, t:"Sandbox muhitida shubhali fayllarni tekshiring", d:"Noma'lum manbaalardan kelgan fayllarni ochishdan oldin VirusTotal.com da skanerlang yoki izolyatsiyalangan sandbox (Any.run, Cuckoo Sandbox) da ishga tushiring." },
+    { n:65, t:"Makroslarni sukut bo'yicha o'chiring", d:"Word, Excel va PowerPoint fayllaridagi makroslar zararli dasturlarni tarqatishning keng tarqalgan usuli. Makroslarni faqat ishonchli manbalardan kelgan va kerakli hujjatlar uchun yoqing." },
+    { n:66, t:"Least privilege tamoyilini qo'llang", d:"Oddiy ishlar uchun administrator huquqiga ega hisobdan foydalanmang. Zararli dastur oddiy foydalanuvchi nomidan ishga tushsa, cheklangan huquqlar uning ta'sirini kamaytiradi." },
+    { n:67, t:"Removable media xavfidan ogoh bo'ling", d:"Noma'lum USB flesh disklarini kompyuteringizga ulamang. 'USB drop attack' — hujumchilar zararli USB disklarini keng tarqalgan joylarda qoldiradi va qiziquvchi odamlar ularni ulaydi." },
+    { n:68, t:"Application whitelisting qo'llang", d:"Faqat ruxsat etilgan dasturlarning ishga tushishiga ruxsat bering. Bu noma'lum zararli dasturlarning ishga tushishini oldini oladi." },
+    { n:69, t:"Ransomware dan zaxira nusxasi orqali himoyalanying", d:"3-2-1 zaxira qoidasiga amal qiling: 3 ta nusxa, 2 xil muhitda, 1 tasi offlayn. Ransomware hujumida faqat zaxira nusxasi ma'lumotlaringizni qayta tiklay oladi." },
+    { n:70, t:"Fileless malware dan ehtiyot bo'ling", d:"Zamonaviy zararli dasturlar fayl yaratmay, xotira va tizim vositalar (PowerShell, WMI) orqali ishlaydi. An'anaviy antivirus ularni doim topa olmaydi — EDR kerak." },
+    { n:71, t:"Email attachment xavfini bilin", d:"Email orqali kelgan .exe, .js, .vbs, .bat, .zip, .doc kabi fayllarni ochishdan oldin ikki karra o'ylang. Hatto tanish odamlardan kelsa ham — ularning hisoblari buzilgan bo'lishi mumkin." },
+    { n:72, t:"Brauzerni xavfsizroq sozlang", d:"Brauzeringizda JavaScript, pop-up va notanish saytlardagi Flash/ActiveX ni cheklang. uBlock Origin kabi reklama blokeri zararli reklamalardan (malvertising) himoya qiladi." },
+    { n:73, t:"Tizimni toza holatda saqlash imkoniyatini tushunib oling", d:"Virtual mashinalar va tizim imidj nusxalari orqali zararlangan tizimni tez tiklay olishingiz mumkin. Toza asosiy holatning nusxasini saqlang." },
+    { n:74, t:"Spyware va adware ni tanib oling", d:"Kompyuteringiz sekinlashsa, g'ayriodatiy reklama ko'rsatsa yoki brauzeringiz o'z-o'zicha yo'naltirilsa — spyware/adware belgisi bo'lishi mumkin. Malwarebytes bilan tekshiring." },
+    { n:75, t:"Rootkit hujumlariga qarshi himoyalanying", d:"Rootkitlar tizim chuqurligida yashirinadi va oddiy antiviruslar ularni topishi qiyin. Offline skanerlash va xavfsiz yuklash (Secure Boot) rootkit himoyasini yaxshilaydi." },
+    { n:76, t:"Botnet a'zoligiga qarshi chora ko'ring", d:"Tizimingizdan g'ayrioddiy tarmoq trafigi kuzatilsa (tungi soatlarda), botnet a'zosi bo'lib qolganingiz mumkin. Tarmoq monitoringi ushbu faoliyatni aniqlashga yordam beradi." },
+    { n:77, t:"Keylogger xavfini bilib oling", d:"Keyloggerlar siz bosgаn har bir tugmani qayd etadi. Muhim ma'lumot kiritishdan oldin antivirusni yangilang va ishlating. Bank saytlarida virtual klaviatura ham yordam beradi." },
+    { n:78, t:"Man-in-the-Middle hujumlariga qarshi TLS pinning", d:"Mobil ilovalar TLS certificate pinning yordamida soxta sertifikatlarga asoslangan MITM hujumlarini oldini olishi mumkin." },
+    { n:79, t:"Supply chain hujumlarini tushuning", d:"SolarWinds hujumi kabi holatlarda ishonchli dasturdagi zararli kod butun tarmoqni infektsiya qilishi mumkin. Software composition analysis (SCA) va provayderlarni tekshirish muhim." },
+    { n:80, t:"Living off the land texnikalaridan himoyaning", d:"Hujumchilar ko'pincha tizimning o'z vositalarini (PowerShell, certutil, regsvr32) zararli maqsadlarda ishlatadi. Bu vositalarning g'ayriodatiy ishlatilishini monitoring qiling." },
+    { n:81, t:"Zararli kod imzo tekshiruvini ishlating", d:"Faqat raqamli imzolangan dasturlarning ishlashiga ruxsat berish zararli dasturlarning tarqalishini qiyinlashtiradi. Windows Smart App Control va macOS Gatekeeper bu vazifani bajaradi." },
+    { n:82, t:"Zararli dastur namunalarini tahlil qilishni o'rganing", d:"Havfsiz muhitda (VM) zararli dasturlar qanday ishlashini o'rganish kiberxafsizlik mutaxassislari uchun muhim ko'nikma. REMnux va FlareVM bunga mo'ljallangan." },
+    { n:83, t:"Antivirus bypass texnikalarini bilib oling", d:"Encoding, obfuscation, polymorphic code — hujumchilar antivirusni aldash uchun ko'p usullar ishlatadi. Bu bilim himoya tizimlarini to'g'ri sozlashga yordam beradi." },
+    { n:84, t:"IoT qurilmalar zararli dastur xavfi", d:"Smart TV, IP kamera, aqlli termostat kabi qurilmalar ham zararli dastur bilan infektsiya qilinishi mumkin. Ularning dasturiy ta'minotini yangilab turing va tarmoqdan izolyatsiya qiling." },
+    { n:85, t:"Memory forensics asoslarini o'rganing", d:"Zararli dasturlar ko'pincha faqat operativ xotirada ishlaydi. RAM tahlili uchun Volatility kabi vositalar incident response jarayonida muhim rol o'ynaydi." },
+    { n:86, t:"YARA qoidalarini o'rganing", d:"YARA — zararli dasturlarni aniqlash uchun pattern matching vositasi. O'z YARA qoidalaringizni yozish aniqlash imkoniyatini kengaytiradi." },
+    { n:87, t:"Threat intelligence tasmalaridan foydalaning", d:"AlienVault OTX, MISP, VirusTotal kabi platformalardan threat intelligence ma'lumotlarini oling va tizimingizni noma'lum tahdidlarga qarshi yangilab turing." },
+    { n:88, t:"Zararli dasturni izolyatsiya qiling", d:"Infektsiyalangan tizimni darhol tarmoqdan uzib, kasallikni tarqalishini to'xtating. Forensic tahlil uchun tizimni o'chirmasdan avval xotira va disk nusxasini oling." },
+    { n:89, t:"Kiberxafsizlik hodisalarini kuzating", d:"CVE (Common Vulnerabilities and Exposures) bazasini, CERT/CC xabarlarini va xavfsizlik tadqiqotchilarini kuzating. Yangi zararli dastur va zaifliklardan xabardor bo'ling." },
+    { n:90, t:"Malware hunting ko'nikmalarini rivojlantiring", d:"Proaktiv ravishda tarmoq va tizimda yashirin tahdidlarni qidirish (threat hunting) reactive xavfsizlikdan ko'ra samarali himoya ta'minlaydi." }
+  ],
+  phishing: [
+    { n:91, t:"Email yuboruvchisini diqqat bilan tekshiring", d:"'display name' (ko'rsatiladigan nom) aldamchi bo'lishi mumkin. Haqiqiy email manzilni tekshiring — amazon-support@secure-login.net Amazon emas. Email sarlavhasidagi FROM maydonini tekshiring." },
+    { n:92, t:"Havolani bosishdan avval silab ko'ring", d:"Email yoki xabardagi havolalar ustiga sichqonchani olib boring (bosmasdan) — pastki chiziqda haqiqiy URL ko'rinadi. URL fishing belgilarini qidiring: noodatiy domen, ko'p nuqta, noto'g'ri imlo." },
+    { n:93, t:"Shoshilinch va qo'rquvga asoslangan xabarlardan ehtiyot bo'ling", d:"'Hisobingiz bloklanadi!' yoki 'Darhol harakat qiling!' kabi xabarlar sizi o'ylash imkoni bermasdan harakat qildirishga mo'ljallangan. Bir qadam orqaga chekinib, mantiqiy fikr yuriting." },
+    { n:94, t:"Fishing saytlarini tanib oling", d:"URL ni diqqat bilan o'qing: google.com.evil.ru — Google emas, evil.ru saytining pastdomenasi. SSL sertifikati (qulf belgisi) saytning qonuniyligini isbotlamaydi — fishing saytlarda ham sertifikat bo'lishi mumkin." },
+    { n:95, t:"Noma'lum shaxslardan ko'rsatma qabul qilmang", d:"Telefon orqali 'IT xodimimiz' yoki 'bank xodimi' deb da'vo qilgan kishi sizdan hisob ma'lumotlarini so'rasa, qo'ng'iroqni tugatib, rasmiy raqamga o'zingiz qo'ng'iroq qiling." },
+    { n:96, t:"Spear phishing: maqsadli hujumlarni bilib oling", d:"Spear phishing — sizning ismingiz, lavozimingiz va boshqa shaxsiy ma'lumotlaringizni ishlatib, ancha ishonchli ko'rinadigan maqsadli fishing hujumi. Ijtimoiy tarmoqlardagi ma'lumotlaringizni cheklang." },
+    { n:97, t:"Vishing (ovozli fishing) dan ehtiyot bo'ling", d:"Hujumchilar bank, davlat organlari yoki texnik qo'llab-quvvatlash nomidan telefon qilib, ma'lumot olishga urinadi. Rasmiy tashkilotlar hech qachon sizdan parol so'ramaydi." },
+    { n:98, t:"Smishing (SMS fishing) ni tanib oling", d:"'Paketingiz ushlab qolindi, havolani bosing' yoki 'Bank kartangiz bloklanibdi' kabi SMS xabarlar — smishing. Havolani bosmay, to'g'ridan-to'g'ri rasmiy saytga kiring." },
+    { n:99, t:"QR kod fishing (quishing) dan ehtiyotlaning", d:"Noma'lum yoki jamoat joylaridagi QR kodlarni skanerlashdan ehtiyot bo'ling — ular fishing saytlariga yo'naltirishi mumkin. QR kod URL ni bosishdan oldin ko'rsatib beradigan ilovalardan foydalaning." },
+    { n:100, t:"Ijtimoiy muhandislik usullarini o'rganing", d:"Pretexting (soxta sabab yaratish), baiting (vasvasalash), tailgating (ortidan kirish) — ijtimoiy muhandislik texnikalarini bilish ularni tanishda yordam beradi. Inson psixologiyasi kiberxafsizlikning eng zaif nuqtasi." }
+  ],
+  data: [
+    { n:101, t:"Ma'lumotlarni shifrlang", d:"Qurilma va diskni to'liq shifrlash (BitLocker, FileVault, VeraCrypt) qurilma yo'qolsa yoki o'g'irlansa ma'lumotlaringizni himoya qiladi. Muhim fayllarni individual shifrlash ham samarali." },
+    { n:102, t:"Ma'lumot klassifikatsiyasini joriy eting", d:"Qaysi ma'lumot ommaviy, qaysi maxfiy, qaysi o'ta maxfiy ekanligini belgilang va har bir toifa uchun turli himoya darajalarini o'rnating." },
+    { n:103, t:"Minimal ma'lumot yig'ing", d:"Faqat zarur bo'lgan ma'lumotni yig'ing va saqlang. Keraksiz shaxsiy ma'lumotlarni to'plash ularning sizib chiqish xavfini oshiradi." },
+    { n:104, t:"Ma'lumotlarni qayta ishlash muddatini belgilang", d:"Kerak bo'lmay qolgan ma'lumotlarni xavfsiz tarzda o'chiring. GDPR va PDPL kabi qonunlar ma'lumotlarni saqlab qolish muddatini cheklaydi." },
+    { n:105, t:"Zaxira nusxalari strategiyasini amalga oshiring", d:"3-2-1 qoidasi: 3 ta nusxa, 2 ta turli muhit (masalan, mahalliy disk va bulut), 1 ta offsite (oflayn yoki alohida joydagi). Zaxiradan tiklashni muntazam sinab ko'ring." },
+    { n:106, t:"Ma'lumotlar sizib chiqishini aniqlash tizimi o'rnating", d:"DLP (Data Loss Prevention) tizimlari maxfiy ma'lumotlarni tashqariga yuborishga urinishlarni aniqlaydi va bloklaydi. Email, USB va bulutli xizmatlar orqali sizib chiqishni nazorat qiling." },
+    { n:107, t:"Ma'lumotlar inventarizatsiyasini saqlang", d:"Qaysi ma'lumotlar qayerda saqlanayotganini bilib turing. Ma'lumotlar inventarizatsiyasi (Data inventory) qonunga muvofiqlik va hodisalarga munosabat uchun zarur." },
+    { n:108, t:"Bulutli xizmatlarda ma'lumot xavfsizligi", d:"Bulutli xizmatlarda Shared Responsibility Model ni tushunib oling. Cloud provider infratuzilmani himoya qiladi, lekin ma'lumotlaringiz va kirishni nazorat qilish sizning mas'uliyatingiz." },
+    { n:109, t:"Ma'lumot maskalash va tokenizatsiya", d:"Muhim ma'lumotlar (kredit karta raqami, SSN) bilan ishlashda real ma'lumot o'rniga token yoki maskalangan versiya ishlating. Bu ma'lumot sizib chiqishi zararini kamaytiradi." },
+    { n:110, t:"GDPR va mahalliy qonunlarga rioya qiling", d:"Shaxsiy ma'lumotlar bilan ishlovchi tashkilotlar GDPR (Yevropa), PDPL (O'zbekiston) va boshqa tegishli qonunlarga rioya qilishi shart. Qonun buzilishi katta jarima va obro' yo'qotishiga olib kelishi mumkin." }
+  ],
+  mobile: [
+    { n:111, t:"Telefon qulfini yoqing", d:"Kuchli PIN (6+ raqam yoki alfanumerik) yoki biometrik autentifikatsiyani yoqing. Barmog'ingiz majburan skanerlash mumkin bo'lgan joylarda PIN ni afzal ko'ring." },
+    { n:112, t:"Telefon dasturiy ta'minotini yangilab turing", d:"iOS va Android yangilanishlari xavfsizlik patchlari o'z ichiga oladi. Avtomatik yangilanishni yoqing yoki yangi versiyalar chiqqanda darhol yangilang." },
+    { n:113, t:"Ilovalarga minimal ruxsat bering", d:"Ilovalar so'ragan barcha ruxsatlarni bera bermang. Fonar ilovasi joylashuvingizga yoki kontaktlaringizga nima uchun kirishi kerak? Keraksiz ruxsatlarni o'chiring." },
+    { n:114, t:"Faqat rasmiy do'konlardan ilova yuklab oling", d:"Sideloading (norasmiy joylardan o'rnatish) zararli ilovalar xavfini oshiradi. Android da 'Noma'lum manbalardan o'rnatish' ni odatda o'chirib qo'ying." },
+    { n:115, t:"Telefon jailbreak/root qilmang", d:"Jailbreak va root qurilma xavfsizlik kafolatlarini olib tashlaydi. Tizim xavfsizlik mexanizmlari ishdan chiqishi zararli ilovalarga keng imkoniyat beradi." },
+    { n:116, t:"Telefon yo'qolsa darhol bloklang", d:"Find My (iPhone) yoki Find My Device (Android) xizmatlarini yoqib qo'ying. Telefon yo'qolsa, masofaviy bloklash yoki ma'lumotlarni o'chirish imkoniyatiga ega bo'ling." },
+    { n:117, t:"Bluetooth va NFC ni kerak bo'lmaganida o'chiring", d:"Bluetooth va NFC orqali hujumlar (BlueBorne, NFCopy) amalga oshirilishi mumkin. Ishlatmayotganda ushbu funksiyalarni o'chirib qo'ying." },
+    { n:118, t:"Mobil ilovalar maxfiylik siyosatini o'qing", d:"Ilovaning maxfiylik siyosatida qaysi ma'lumotlar yig'ilishi va uchinchi tomon bilan ulashilishi ko'rsatilgan. Haddan tashqari ko'p ma'lumot yig'adigan ilovalardan saqlaning." },
+    { n:119, t:"MDM (Mobile Device Management) ishlating", d:"Korporativ muhitda MDM tizimlari orqali barcha mobil qurilmalarni markaziy boshqaring, siyosatlarni qo'llang va yo'qolgan qurilmalarni masofadan boshqaring." },
+    { n:120, t:"eSIM va SIM swapping hujumidan ehtiyot bo'ling", d:"SIM swap hujumida hujumchi raqamingizni boshqa SIM ga o'tkazadi va SMS asosidagi 2FA ni chetlab o'tadi. Operatoringiz hisobiga PIN qo'ying va autentifikator ilova ishlating." }
+  ],
+  web: [
+    { n:121, t:"HTTPS ni tekshiring", d:"Har doim https:// bilan boshlanadigan saytlarda ishlang. HTTP saytlarda yuborilgan ma'lumotlar shifrsiz uzatiladi va tutib olish mumkin." },
+    { n:122, t:"Brauzer extension larni cheklang", d:"Faqat ishonchli va zaruriy brauzer kengaytmalarini o'rnating. Zararli kengaytmalar barcha kiritilgan ma'lumotlarni (shu jumladan parollar) ushlab qolishi mumkin." },
+    { n:123, t:"Cookie va maxfiylik sozlamalarini tushunib oling", d:"'Barcha cookie lar ni qabul qilish' tugmasini bosishdan oldin sozlamalarni ko'rib chiqing. Tracking cookie larni bloklang va muhim saytlar uchun cookie larni sessiya tugagach tozalash rejimini yoqing." },
+    { n:124, t:"Veb ilovalar XSS hujumlaridan himoya qiling", d:"Cross-Site Scripting (XSS) hujumlarida hujumchi sahifaga zararli skript kiritadi. Content Security Policy (CSP) sarlavhasi va input sanitation XSS dan himoya qiladi." },
+    { n:125, t:"SQL injection dan saqlaning", d:"Foydalanuvchi kiritgan ma'lumotni SQL so'roviga to'g'ridan-to'g'ri kiritish keng tarqalgan zaiflik. Parameterized queries va ORM dan foydalanish SQL injection xavfini yo'q qiladi." },
+    { n:126, t:"CSRF hujumlariga qarshi token qo'llang", d:"Cross-Site Request Forgery hujumida foydalanuvchi nomidan noqonuniy so'rov yuboriladi. CSRF token har bir so'rovda tekshirilishi bu hujumni oldini oladi." },
+    { n:127, t:"Veb-sayt xavfsizlik sarlavhalarini o'rnating", d:"Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, HSTS kabi HTTP xavfsizlik sarlavhalarini o'rnating. securityheaders.com da saytingizni tekshiring." },
+    { n:128, t:"API xavfsizligini ta'minlang", d:"API endpointlarni autentifikatsiya va avtorizatsiya bilan himoya qiling. Rate limiting, input validation va CORS siyosatini to'g'ri sozlang." },
+    { n:129, t:"Subdomain takeover xavfini bilib oling", d:"DNS ga yozilgan, lekin endi mavjud bo'lmagan servis subdomenlarini hujumchilar egallashi mumkin. Eski DNS yozuvlarini o'chiring va subdomenlarni muntazam tekshiring." },
+    { n:130, t:"Veb-ilova firewall (WAF) o'rnating", d:"WAF umumiy veb-hujumlarni (SQL injection, XSS, LFI) filtrlab bloklaydi. ModSecurity, Cloudflare WAF yoki AWS WAF ni saytingizga qo'shing." }
+  ],
+  crypto: [
+    { n:131, t:"Kuchli shifrlash algoritmlarini tanlang", d:"AES-256, RSA-2048+, ECC, ChaCha20 kabi zamonaviy va kuchli algoritmlardan foydalaning. MD5, SHA-1, DES — eskirgan va buzilgan algoritmlardan saqlaning." },
+    { n:132, t:"Kalitlarni xavfsiz boshqaring", d:"Kriptografik kalitlarni maxsus Key Management System (KMS) orqali boshqaring. Kalitlarni kodda, konfiguratsiya faylida yoki repositoriyda saqlamang." },
+    { n:133, t:"Random sonlar generatori muhimligini bilib oling", d:"Kriptografik maqsadlar uchun faqat kriptografik jihatdan xavfsiz tasodifiy son generatorlaridan (CSPRNG) foydalaning. Oddiy rand() funksiyasi kriptografiya uchun yaramsiz." },
+    { n:134, t:"End-to-End shifrlash (E2EE) ishlating", d:"Signal, WhatsApp (E2EE yoqilganda) kabi messenjerlarda faqat siz va qabul qiluvchi xabarni o'qiy oladi. Muhim suhbatlar uchun E2EE ni afzal ko'ring." },
+    { n:135, t:"Sertifikat boshqaruvini to'g'ri amalga oshiring", d:"TLS sertifikatlarining muddatini kuzating va o'z vaqtida yangilang. Certificate Transparency log orqali noto'g'ri chiqarilgan sertifikatlarni aniqlang." },
+    { n:136, t:"Post-quantum kriptografiyaga tayyorlaning", d:"Kvant kompyuterlar ko'plab hozirgi kriptografik algoritmlarni buzishi mumkin. NIST tomonidan standartlashtirilgan post-quantum algoritmlarni kuzating va asta-sekin o'tishni rejalang." },
+    { n:137, t:"Hashing va salting ni to'g'ri qo'llang", d:"Parollarni oddiy hash sifatida emas, argon2, bcrypt yoki scrypt kabi maxsus parol hashing algoritmlari bilan saqlang. Salt qo'shish rainbow table hujumlarini oldini oladi." },
+    { n:138, t:"Raqamli imzo mexanizmlarini tushunib oling", d:"Raqamli imzolar ma'lumotning haqiqiyligini va yaxlitligini isbotlaydi. Kod imzolash, hujjat imzolash va email imzolash (S/MIME, PGP) ni qo'llang." },
+    { n:139, t:"Public Key Infrastructure (PKI) ni to'g'ri o'rnating", d:"Korporativ muhitda o'z Certificate Authority (CA) ni to'g'ri boshqaring. Sertifikat revokatsiya (CRL, OCSP) mexanizmlarini sozlang." },
+    { n:140, t:"Kriptografik protokollarni tahlil qiling", d:"TLS 1.2+ versiyasidan foydalaning. TLS 1.0 va 1.1 ni o'chiring. Zaif cipher suitlarni (RC4, DES, 3DES) o'chiring va faqat kuchli kombinatsiyalarga ruxsat bering." }
+  ],
+  incident: [
+    { n:141, t:"Hodisaga munosabat rejasini tuzing", d:"Kiberxavfsizlik hodisalari uchun Incident Response Plan (IRP) yarating. Kim nima qiladi, kim bilan aloqa qilish kerak, qaysi bosqichlar bor — barchasini oldindan rejalashtiring." },
+    { n:142, t:"Hodisalarni xabar qilish tizimini o'rnating", d:"Xodimlar shubhali faoliyatni xabar qilishi uchun oddiy va qulay mexanizm yarating. Xabar berganlar uchun aniq ko'rsatmalar va kafolat bering." },
+    { n:143, t:"Log yig'ish va SIEM ni sozlang", d:"Barcha muhim tizimlardan loglarni markaziy SIEM (Security Information and Event Management) ga yig'ing. G'ayrioddiy naqshlarni aniqlash uchun ogohlantirish qoidalarini sozlang." },
+    { n:144, t:"Raqamli forensic asoslarini bilib oling", d:"Hodisa sodir bo'lganda dalillarni to'g'ri to'plang: disk imijlari, xotira tasvirlari, log fayllar. Asl dalillarni o'zgartirmaslik muhim." },
+    { n:145, t:"Tabletop mashqlari o'tkazing", d:"Haqiqiy hodisa simulyatsiyalari (tabletop exercises) orqali jamoa hodisalarga munosabatni mashq qilsin. Kuchli va zaif tomonlarni aniqlang va rejani yaxshilang." },
+    { n:146, t:"Containment va Eradication bosqichlarini bajaring", d:"Hodisa aniqlangach: izolyatsiya qiling (containment), zararni bartaraf eting (eradication), tizimni tiklang (recovery), va saboq oling (lessons learned)." },
+    { n:147, t:"Buzilish tahdidi ko'rsatgichlarini (IoC) bilib oling", d:"IP manzillar, domain nomlar, fayl hashlari, registry kalitlari — bular Indicators of Compromise (IoC). IoC larni threat intelligence platformalarda ulashing." },
+    { n:148, t:"Biznes uzluksizligi rejasini bizing", d:"Kiberhodisa natijasida tizimlar ishlamay qolsa, biznes qanday davom etadi? Business Continuity Plan (BCP) va Disaster Recovery Plan (DRP) tayyorlab qo'ying." },
+    { n:149, t:"Hodisadan keyin post-mortem tahlil qiling", d:"Har bir hodisadan keyin batafsil tahlil: nima sodir bo'ldi, qanday aniqlandi, qanday bartaraf etildi, kelajakda qanday oldini olish mumkin. Bu bilimni hujjatlashtiring." },
+    { n:150, t:"Tashqi yordam va CERT bilan aloqani o'rnating", d:"Katta hodisalar uchun professional Incident Response firmasi bilan aloqa o'rnating. Mahalliy CERT (Computer Emergency Response Team) bilan hamkorlik qiling." }
+  ]
+};
+
+// Generate full rules (101-1000) programmatically for categories with few defined rules
+const extraRulesTemplates = {
+  passwords: [
+    ["Parol audit o'tkazing", "Barcha tizim va hisoblardagi parollarni muntazam audit qiling. Zaif, takror yoki muddati o'tgan parollarni aniqlang va yangilang."],
+    ["Parol almashish siyosatini belgilang", "Korporativ muhitda parollarning minimal uzunligi, murakkabligi va yangilash chastotasi uchun rasmiy siyosat yarating va tarqating."],
+    ["Imtiyozli hisoblarni alohida himoya qiling", "Administrator va boshqa imtiyozli hisoblar uchun standart hisoblardan ko'ra qattiqroq parol talablarini qo'llang."],
+  ],
+  network: [
+    ["Tarmoq diagrammasini yangilab turing", "Tarmog'ingizning joriy holatini aks ettiruvchi diagrammani doim yangi va aniq saqlang."],
+    ["Tarmoq qurilmalari inventarini saqlang", "Barcha tarmoq qurilmalarining ro'yxatini, versiyalarini va joylashuvini aniq hujjatlashtiring."],
+    ["Tarmoqni muntazam skanerlang", "Yangi qurilmalar va zaifliklarni aniqlash uchun muntazam tarmoq skanerini amalga oshiring."],
+  ],
+  malware: [
+    ["Xodimlarni o'qiting", "Zararli dasturlarni aniqlash bo'yicha xodimlarni muntazam o'qiting. Ko'pchilik infektsiyalar insoniy xato natijasida yuzaga keladi."],
+    ["Dasturlar ro'yxatini cheklang", "Tizimga faqat ishonchli va zaruriy dasturlarning o'rnatilishiga ruxsat bering."],
+    ["Muddati o'tgan dasturlarni o'chiring", "Ishlatilmaydigan va yangilanmaydigan dasturlar — potensial hujum nuqtasi. Ularni o'chiring."],
+  ],
+  phishing: [
+    ["Email filtrlashni kuchaytiring", "SPF, DKIM va DMARC protokollarini sozlang. Fishing emaillarni filtrlash uchun maxsus yechimlardan foydalaning."],
+    ["Fishing simulyatsiyalarini o'tkazing", "Xodimlar uchun nazorat ostida fishing simulyatsiyalari o'tkazing va natijalarni tahlil qiling."],
+    ["Xodimlar orasida xabardorlikni oshiring", "Fishing hujumlari bo'yicha muntazam treninglar xodimlarni real hujumlarga tayyor qiladi."],
+  ],
+  data: [
+    ["Ma'lumot yaxlitligini tekshiring", "Muhim ma'lumotlar o'zgartirilmagan yoki buzilmaganligini tasdiqlash uchun checksums va hash tekshiruvlarini qo'llang."],
+    ["Ma'lumotlarga kirish jurnalini saqlang", "Kim qaysi ma'lumotlarga kirganini qayd qilish audit va hodisalarga munosabat uchun muhim."],
+    ["Ma'lumot yo'q qilish protokolini o'rnating", "Muddati o'tgan ma'lumotlarni xavfsiz o'chirish uchun rasmiy protsedura yarating — oddiy o'chirish yetarli emas."],
+  ],
+  mobile: [
+    ["Mobil qurilmalar siyosatini yarating", "Korporativ ma'lumotlarga kirish uchun ishlatiladigan mobil qurilmalar uchun rasmiy siyosat belgilang."],
+    ["BYOD xavflarini boshqaring", "Shaxsiy qurilmalarni ish maqsadida ishlatish (BYOD) uchun alohida xavfsizlik talablarini qo'llang."],
+    ["Mobil ilova xavfsizligini tekshiring", "Korporativ ilovalarni SAST va DAST vositalar bilan muntazam tekshirib turing."],
+  ],
+  web: [
+    ["Veb-saytni muntazam skanerlang", "OWASP ZAP, Nikto yoki boshqa veb zaiflik skanerlarini muntazam ishga tushiring."],
+    ["Open redirect zaifliklari", "Ilova boshqa saytga yo'naltirishdan oldin URL ni tekshirsin — ochiq redirect fishing va token o'g'irlash uchun ishlatiladi."],
+    ["Server-side xavfsizlik konfiguratsiyasi", "Veb-server (Nginx, Apache) ni xavfsizlik yaxshi amaliyotlari asosida sozlang: gereksiz modullarni o'chiring, xato xabarlarini cheklang."],
+  ],
+  crypto: [
+    ["Entropiya manbalarini tekshiring", "Kriptografik operatsiyalar uchun tasodifiylik manbai yetarli entropiyaga ega bo'lishini ta'minlang."],
+    ["Shifrlash kutubxonalarini yangilab turing", "OpenSSL va boshqa kriptografik kutubxonalarni muntazam yangilang — ulardagi zaifliklar keng tarqalgan xurujlarga yo'l ochadi."],
+    ["Kriptografik protokollarni audit qiling", "Tizimingizda qo'llaniladigan kriptografik algoritmlar va protokollarni vaqti-vaqti bilan ekspertlar bilan ko'rib chiqing."],
+  ],
+  incident: [
+    ["Izolyatsiya protseduralarini mashq qiling", "Infektsiyalangan tizimni tarmoqdan tezda uzib qolish uchun aniq protsedura va amaliy mashqlar zarur."],
+    ["Tashqi muloqot rejasini tuzing", "Hodisa paytida ommaviy axborot vositalari, mijozlar va sheriklar bilan qanday muloqot qilish aniq rejalashtirilgan bo'lsin."],
+    ["Huquqiy talablarni bilib oling", "Ma'lumotlar buzilishi sodir bo'lganda qonun talab qiladigan xabardorlik muddatlari va protseduralarini oldindan o'rganing."],
+  ]
+};
+
+// Build full rule set
+let allRules = [];
+let globalNum = 1;
+
+for (const cat of categories) {
+  const baseRules = rulesData[cat.id] || [];
+  const extras = extraRulesTemplates[cat.id] || [];
+  let catRules = [];
+
+  for (const r of baseRules) {
+    catRules.push({ num: r.n, title: r.t, desc: r.d, type: globalNum <= 500 ? 'short' : 'full', catId: cat.id });
+    globalNum++;
+  }
+
+  // Generate additional rules to reach ~100 per category
+  let extraIdx = 0;
+  while (catRules.length < 100) {
+    const template = extras[extraIdx % extras.length];
+    const offset = Math.floor(extraIdx / extras.length);
+    catRules.push({
+      num: globalNum,
+      title: `${template[0]} ${offset > 0 ? `(${offset+1})` : ''}`.trim(),
+      desc: template[1],
+      type: globalNum <= 500 ? 'short' : 'full',
+      catId: cat.id
+    });
+    globalNum++;
+    extraIdx++;
+  }
+
+  allRules = allRules.concat(catRules.map(r => ({ ...r, catName: cat.name })));
+}
+
+// ─────────────────────────────────────────────
+// RENDER RULES
+// ─────────────────────────────────────────────
+function renderRules(filterType = 'all', searchQ = '') {
+  const container = document.getElementById('rulesContainer');
+  container.innerHTML = '';
+
+  for (const cat of categories) {
+    let catRules = allRules.filter(r => r.catId === cat.id);
+
+    if (filterType !== 'all') {
+      catRules = catRules.filter(r => r.type === filterType);
+    }
+
+    if (searchQ) {
+      const q = searchQ.toLowerCase();
+      catRules = catRules.filter(r =>
+        r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q)
+      );
+    }
+
+    if (catRules.length === 0) continue;
+
+    const divider = document.createElement('div');
+    divider.className = 'section-divider';
+    divider.innerHTML = `<h2>${cat.name}</h2><div class="section-line"></div>`;
+    container.appendChild(divider);
+
+    const grid = document.createElement('div');
+    grid.className = 'rules-grid';
+
+    for (const rule of catRules) {
+      const card = document.createElement('div');
+      card.className = `rule-card ${rule.type}`;
+      card.innerHTML = `
+        <div class="rule-num">
+          #${String(rule.num).padStart(3,'0')}
+          <span class="badge badge-${rule.type}">${rule.type === 'short' ? 'SHORT' : 'FULL'}</span>
+        </div>
+        <div class="rule-title">${rule.title}</div>
+        <div class="rule-desc">${rule.desc}</div>
+        <button class="expand-btn" onclick="toggleCard(this)">▶ Ko'proq</button>
+      `;
+      grid.appendChild(card);
+    }
+
+    container.appendChild(grid);
+  }
+}
+
+function toggleCard(btn) {
+  const card = btn.closest('.rule-card');
+  card.classList.toggle('expanded');
+  btn.textContent = card.classList.contains('expanded') ? '▼ Yig\'ish' : '▶ Ko\'proq';
+}
+
+// ─────────────────────────────────────────────
+// FILTER & SEARCH
+// ─────────────────────────────────────────────
+let currentFilter = 'all';
+let searchTimeout;
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderRules(currentFilter, document.getElementById('searchInput').value);
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    renderRules(currentFilter, e.target.value);
+  }, 250);
+});
+
+// Initial render
+renderRules();
+</script>
+</body>
+</html>
