@@ -47,10 +47,3 @@ Loyiha hech qanday og'ir freymvorklarsiz, **Pure (Vanilla) Web Tech** yordamida 
 
 ---
 
-## 🚀 Mahalliy Kompyuterda Ishga Tushirish
-
-Loyihani kompyuteringizda ishga tushirish juda oddiy, chunki u qo'shimcha o'rnatmalarni (`npm install` kabi) talab qilmaydi:
-
-1. Repozitoriyani klon qiling:
-   ```bash
-   git clone [https://github.com/SizningUsername/Kiberxafsizlik-Qoidalari.git](https://github.com/SizningUsername/Kiberxafsizlik-Qoidalari.git)
